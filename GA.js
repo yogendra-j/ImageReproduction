@@ -19,16 +19,21 @@ let inputImgData;
 let p;
 
 class Population {
-  constructor(dense) {
+  constructor(dense, popSize) {
     this.dense = dense;
-    this.dna = [];
-    this.error;
+    this.Population = [];
+    this.popSize = popSize;
+    this.error = [];
   }
   populate() {
-    for (let i = 0; i < this.dense; i++) {
-      this.dna.push(new Polygon(imageW, imageH));
+    for (let j = 0; j < this.popSize; j++) {
+      let dna = [];
+      for (let i = 0; i < this.dense; i++) {
+        dna.push(new Polygon(imageW, imageH));
+      }
+      this.Population.push(dna);
+      this.error.push([this.getFitness(dna), j]);
     }
-    this.error = this.getFitness(this.dna);
   }
 
   draw(dna) {
@@ -38,52 +43,69 @@ class Population {
       c.draw(context);
     });
   }
-  updateBest() {
+  updateBest(k) {
     contextBest.fillStyle = "rgb(255, 255, 255)";
     contextBest.fillRect(0, 0, imageW, imageH);
-    this.dna.forEach((c) => {
+    this.Population[k].forEach((c) => {
       c.draw(contextBest);
     });
-    console.log(this.error);
+    console.log(this.error[0][0]);
   }
-  getFitness(person) {
-    this.draw(person);
+  getFitness(dna) {
+    this.draw(dna);
     return getError();
   }
   newGeneration() {
-    let mutated = [];
-    for (let j = 0; j < this.dense; j++) {
-      let mutatedGene = this.dna[j].copy();
-      if (Math.random() > 0.95) {
-        if (Math.random() > 0.5) {
-          //change color
-          let prob = Math.random();
-          if (prob < 0.25) {
-            mutatedGene.color.r = Math.floor(Math.random() * 256);
-          } else if (prob < 0.5) {
-            mutatedGene.color.g = Math.floor(Math.random() * 256);
-          } else if (prob < 0.75) {
-            mutatedGene.color.b = Math.floor(Math.random() * 256);
-          } else {
-            mutatedGene.color.a = Math.random();
-          }
-        } else {
-          //change vertax
-          let changeVer = Math.floor(Math.random() * 3);
-          Math.random() > 0.5
-            ? (mutatedGene.triangle[changeVer].x = Math.random() * imageW)
-            : (mutatedGene.triangle[changeVer].y = Math.random() * imageH);
-        }
-      }
-
-      mutated.push(mutatedGene);
+    this.error.sort((a, b) => a[0] - b[0]);
+    this.updateBest(this.error[0][1]);
+    let elites = [];
+    for (let i = 0; i < Math.floor(0.05 * this.popSize + 1); i++) {
+      elites.push(this.error[i][1]);
     }
-    let mutatedFitness = this.getFitness(mutated);
-    // fitnees is actually error
-    if (mutatedFitness < this.error) {
-      this.dna = mutated;
-      this.error = mutatedFitness;
-      this.updateBest();
+    for (let k = 0; k < this.popSize; k++) {
+      let mutated = [];
+      for (let j = 0; j < this.dense; j++) {
+        let mutatedGene;
+        if (elites.includes(k)) {
+          mutatedGene = this.Population[k][j].copy();
+        } else {
+          mutatedGene = this.Population[
+            elites[Math.floor(Math.random() * elites.length)]
+          ][j].copy();
+        }
+        if (Math.random() > 0.95) {
+          if (Math.random() > 0.5) {
+            //change color
+            let prob = Math.random();
+            if (prob < 0.25) {
+              mutatedGene.color.r = Math.floor(Math.random() * 256);
+            } else if (prob < 0.5) {
+              mutatedGene.color.g = Math.floor(Math.random() * 256);
+            } else if (prob < 0.75) {
+              mutatedGene.color.b = Math.floor(Math.random() * 256);
+            } else {
+              mutatedGene.color.a = Math.random();
+            }
+          } else {
+            //change vertax
+            let changeVer = Math.floor(Math.random() * 3);
+            Math.random() > 0.5
+              ? (mutatedGene.triangle[changeVer].x = Math.random() * imageW)
+              : (mutatedGene.triangle[changeVer].y = Math.random() * imageH);
+          }
+        }
+
+        mutated.push(mutatedGene);
+      }
+      let mutatedFitness = this.getFitness(mutated);
+      // fitnees is actually error
+      if (mutatedFitness < this.error[k][0]) {
+        this.Population[k] = mutated;
+      }
+    }
+    this.error = [];
+    for (let j = 0; j < this.popSize; j++) {
+      this.error.push([this.getFitness(this.Population[j]), j]);
     }
   }
 }
@@ -104,7 +126,7 @@ input.onchange = function () {
         scale * image.height
       );
       inputImgData = contextInp.getImageData(0, 0, imageW, imageH).data;
-      p = new Population(1000, 20);
+      p = new Population(80, 30);
       p.populate();
       setInterval(beginGA, 0);
     };

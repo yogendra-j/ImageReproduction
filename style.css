@@ -1,8 +1,14 @@
+* {
+  margin: 0.5%;
+  padding: 0%;
+  overflow: hidden;
+}
+
 .canvas {
   display: flex;
 }
-* {
-  margin: 0%;
-  padding: 0%;
-  overflow: hidden;
+
+.labels {
+  display: flex;
+  justify-content: space-between;
 }
