@@ -67,13 +67,13 @@ class Population {
   newGeneration() {
     this.error.sort((a, b) => a[0] - b[0]);
     this.updateBest(this.error[0][1]);
-    for (let i = 1; i < this.popSize; i++) {
+    for (let i = 2; i < this.popSize; i++) {
       let k = this.error[i][1];
       let mutated = [];
       for (let j = 0; j < this.dense; j++) {
         let mutatedGene;
         mutatedGene = this.Population[this.error[0][1]][j].copy();
-        if (Math.random() > 0.995 - 0.002 * i) {
+        if (Math.random() > 0.99 - 0.004 * i) {
           if (Math.random() > 0.5) {
             //change color
             let prob = Math.random();
@@ -93,8 +93,8 @@ class Population {
               ? (mutatedGene.triangle[changeVer].x = Math.random() * imageW)
               : (mutatedGene.triangle[changeVer].y = Math.random() * imageH);
           }
-        } else if (Math.random() < FitPercent / 100 - 0.05 * i) {
-          mutatedGene = this.Population[this.error[i][1]][j].copy();
+        } else if (Math.random() < FitPercent / 100 - 0.1 * i) {
+          mutatedGene = this.Population[this.error[1][1]][j].copy();
         }
 
         mutated.push(mutatedGene);
@@ -126,7 +126,7 @@ input.onchange = function () {
       inputImgData = contextInp.getImageData(0, 0, imageW, imageH).data;
       worstError = (inputImgData.length / 4) * (255 * 3 + 150);
       console.log(worstError);
-      p = new Population(170, 30);
+      p = new Population(70, 40);
       p.populate();
       setInterval(beginGA, 0);
     };
