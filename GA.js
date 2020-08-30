@@ -12,7 +12,14 @@ const canvasInp = document.querySelector("#input");
 const contextInp = canvasInp.getContext("2d");
 canvasInp.width = document.documentElement.clientWidth * 0.32;
 canvasInp.height = canvas.width;
-
+const downloadLink = document.getElementById("downloadImg");
+downloadLink.addEventListener("click", function () {
+  this.href = canvas
+    .toDataURL("image/jpg")
+    .replace("image/jpg", "image/octet-stream");
+});
+let FitPercent;
+let worstError;
 let imageW = canvas.width;
 let imageH = canvas.height;
 let inputImgData;
@@ -49,6 +56,8 @@ class Population {
     this.Population[k].forEach((c) => {
       c.draw(contextBest);
     });
+    FitPercent = ((1 - this.error[0][0] / worstError) * 100).toFixed(2);
+    document.getElementById("match").textContent = FitPercent;
     console.log(this.error[0][0]);
   }
   getFitness(dna) {
@@ -58,19 +67,15 @@ class Population {
   newGeneration() {
     this.error.sort((a, b) => a[0] - b[0]);
     this.updateBest(this.error[0][1]);
-    let elites = [];
-    for (let i = 0; i < Math.floor(0.08 * this.popSize + 1); i++) {
-      elites.push(this.error[i][1]);
-    }
     for (let k = 0; k < this.popSize; k++) {
-      if (elites.includes(k)) {
+      if (k === this.error[0][1]) {
         continue;
       }
       let mutated = [];
       for (let j = 0; j < this.dense; j++) {
         let mutatedGene;
-        mutatedGene = this.Population[elites[0]][j].copy();
-        if (Math.random() > 0.97) {
+        mutatedGene = this.Population[this.error[0][1]][j].copy();
+        if (Math.random() > FitPercent / 100 + 0.1) {
           if (Math.random() > 0.5) {
             //change color
             let prob = Math.random();
@@ -119,7 +124,9 @@ input.onchange = function () {
         scale * image.height
       );
       inputImgData = contextInp.getImageData(0, 0, imageW, imageH).data;
-      p = new Population(80, 10);
+      worstError = (inputImgData.length / 4) * (255 * 3 + 150);
+      console.log(worstError);
+      p = new Population(150, 20);
       p.populate();
       setInterval(beginGA, 0);
     };
@@ -128,13 +135,13 @@ input.onchange = function () {
 
 const getError = () => {
   let outImgData = context.getImageData(0, 0, imageW, imageH).data;
+
   let error = 0;
-  for (let i = 0; i < outImgData.length; i++) {
-    if (i % 3 !== 0) {
-      error += Math.abs(outImgData[i] - inputImgData[i]);
-    } else {
-      error += Math.abs(outImgData[i] - inputImgData[i]) * 50;
-    }
+  for (let i = 0; i < outImgData.length; i += 4) {
+    error += Math.abs(outImgData[i] - inputImgData[i]);
+    error += Math.abs(outImgData[i + 1] - inputImgData[i + 1]);
+    error += Math.abs(outImgData[i + 2] - inputImgData[i + 2]);
+    error += Math.abs(outImgData[i + 3] - inputImgData[i + 3]) * 250;
   }
   return error;
 };

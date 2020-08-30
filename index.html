@@ -7,7 +7,11 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <input type="file" id="img" />
+    <div class="info">
+      <input type="file" id="img" />
+      <span>Match: <span id="match">0</span>%</span>
+      <a id="downloadImg" download="myImage.jpg">Download Best Image</a>
+    </div>
 
     <div class="canvas">
       <canvas id="input"></canvas>

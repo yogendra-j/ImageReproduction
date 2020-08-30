@@ -10,5 +10,47 @@
 
 .labels {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
+}
+.info {
+  display: flex;
+  justify-content: space-around;
+  align-content: center;
+}
+span {
+  color: rgb(221, 28, 221);
+  font-size: 1.5rem;
+}
+#match {
+  color: rgb(42, 165, 63);
+  font-size: 2rem;
+}
+input {
+  background: crimson;
+  color: aliceblue;
+  height: 1.8rem;
+  width: 14rem;
+  text-align: center;
+  align-content: center;
+  padding-top: 0.5rem;
+  padding-left: 1.8rem;
+  margin: 0%;
+  transition-duration: 500ms;
+}
+a {
+  background: crimson;
+  color: aliceblue;
+  height: 1.8rem;
+  width: 10rem;
+  text-align: center;
+  align-content: center;
+  padding-top: 0.3rem;
+  margin: 0%;
+  transition-duration: 500ms;
+}
+a:hover,
+input:hover {
+  background: blue;
+  color: yellow;
+  cursor: pointer;
 }
