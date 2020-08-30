@@ -9,9 +9,9 @@ export class Polygon {
       a: Math.floor(Math.random()),
     };
     this.triangle = [
-      { x: Math.random() * width, y: Math.random() * height },
-      { x: Math.random() * width, y: Math.random() * height },
-      { x: Math.random() * width, y: Math.random() * height },
+      { x: Math.random() * width * 0.5, y: Math.random() * height * 0.5 },
+      { x: Math.random() * width * 0.5, y: Math.random() * height * 0.5 },
+      { x: Math.random() * width * 0.5, y: Math.random() * height * 0.5 },
     ];
   }
 

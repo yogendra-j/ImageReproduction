@@ -59,21 +59,18 @@ class Population {
     this.error.sort((a, b) => a[0] - b[0]);
     this.updateBest(this.error[0][1]);
     let elites = [];
-    for (let i = 0; i < Math.floor(0.05 * this.popSize + 1); i++) {
+    for (let i = 0; i < Math.floor(0.08 * this.popSize + 1); i++) {
       elites.push(this.error[i][1]);
     }
     for (let k = 0; k < this.popSize; k++) {
+      if (elites.includes(k)) {
+        continue;
+      }
       let mutated = [];
       for (let j = 0; j < this.dense; j++) {
         let mutatedGene;
-        if (elites.includes(k)) {
-          mutatedGene = this.Population[k][j].copy();
-        } else {
-          mutatedGene = this.Population[
-            elites[Math.floor(Math.random() * elites.length)]
-          ][j].copy();
-        }
-        if (Math.random() > 0.95) {
+        mutatedGene = this.Population[elites[0]][j].copy();
+        if (Math.random() > 0.97) {
           if (Math.random() > 0.5) {
             //change color
             let prob = Math.random();
@@ -97,11 +94,7 @@ class Population {
 
         mutated.push(mutatedGene);
       }
-      let mutatedFitness = this.getFitness(mutated);
-      // fitnees is actually error
-      if (mutatedFitness < this.error[k][0]) {
-        this.Population[k] = mutated;
-      }
+      this.Population[k] = mutated;
     }
     this.error = [];
     for (let j = 0; j < this.popSize; j++) {
@@ -126,7 +119,7 @@ input.onchange = function () {
         scale * image.height
       );
       inputImgData = contextInp.getImageData(0, 0, imageW, imageH).data;
-      p = new Population(80, 30);
+      p = new Population(80, 10);
       p.populate();
       setInterval(beginGA, 0);
     };
